@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+# DB
+go-crypto-price-tracker.db
