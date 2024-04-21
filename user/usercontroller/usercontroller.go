@@ -3,7 +3,6 @@ package usercontroller
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/adhiyatmarama/go-crypto-price-tracker/database"
@@ -57,8 +56,8 @@ func SignUp(c *fiber.Ctx) error {
 
 	passwordHash, _ := libsbcrypt.HashPassword(user.Password)
 
+	// Add user to table
 	_, err := database.DB.Exec(fmt.Sprintf("INSERT INTO Users(email, password) VALUES('%s', '%s' )", user.Email, passwordHash))
-
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error when create user to DB",
@@ -66,11 +65,15 @@ func SignUp(c *fiber.Ctx) error {
 		})
 	}
 
+	// Get user from table
 	stmt, _ := database.DB.Prepare("select email from Users where email = ?")
 	defer stmt.Close()
 	var email string
 	if err = stmt.QueryRow(user.Email).Scan(&email); err != nil {
-		log.Fatal(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error when get user",
+			"error":   err.Error(),
+		})
 	}
 
 	// create jwt token
