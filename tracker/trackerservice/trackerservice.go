@@ -3,6 +3,7 @@ package trackerservice
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 
@@ -15,6 +16,7 @@ import (
 func CreateTracker(userEmail string, tracker trackermodel.Tracker) (*trackermodel.Tracker, error) {
 	existing, err := GetTrackerByUserEmailAndCoinId(userEmail, tracker.CoinId)
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -25,11 +27,13 @@ func CreateTracker(userEmail string, tracker trackermodel.Tracker) (*trackermode
 	// Add tracker to table
 	_, err = database.DB.Exec(fmt.Sprintf("INSERT INTO Trackers(user_email, coin_id) VALUES('%s', '%s' )", userEmail, tracker.CoinId))
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
 	created, err := GetTrackerByUserEmailAndCoinId(userEmail, tracker.CoinId)
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -48,6 +52,7 @@ func GetTrackersByUser(userEmail string) ([]libscoincap.Coin, error) {
 		return []libscoincap.Coin{}, nil
 	}
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -56,6 +61,7 @@ func GetTrackersByUser(userEmail string) ([]libscoincap.Coin, error) {
 		var coin_id string
 		err = rows.Scan(&coin_id)
 		if err != nil {
+			log.Print(err.Error())
 			return nil, err
 		}
 		coinIds = append(coinIds, coin_id)
@@ -64,6 +70,7 @@ func GetTrackersByUser(userEmail string) ([]libscoincap.Coin, error) {
 	// Get IDR value to USD
 	idrVal, err := libscurrencyapi.GetLatestExchangeRate("USD", "IDR")
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -96,6 +103,7 @@ func GetTrackersByUser(userEmail string) ([]libscoincap.Coin, error) {
 
 	// return error if got error
 	if err := <-getCoinErrorCh; err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -120,6 +128,7 @@ func GetTrackerByUserEmailAndCoinId(userEmail string, coinId string) ([]trackerm
 		return nil, nil
 	}
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -128,6 +137,7 @@ func GetTrackerByUserEmailAndCoinId(userEmail string, coinId string) ([]trackerm
 		var coin_id string
 		err = rows.Scan(&user_email, &coin_id)
 		if err != nil {
+			log.Print(err.Error())
 			return nil, err
 		}
 		result = append(result, trackermodel.Tracker{

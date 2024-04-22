@@ -76,6 +76,7 @@ func GetTrackerByUserEmailAndCoinId(userEmail string, coinId string) ([]trackerm
 		return nil, nil
 	}
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -84,6 +85,7 @@ func GetTrackerByUserEmailAndCoinId(userEmail string, coinId string) ([]trackerm
 		var coin_id string
 		err = rows.Scan(&user_email, &coin_id)
 		if err != nil {
+			log.Print(err.Error())
 			return nil, err
 		}
 		result = append(result, trackermodel.Tracker{

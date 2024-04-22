@@ -2,6 +2,7 @@ package coinservice
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/adhiyatmarama/go-crypto-price-tracker/libs/libscoincap"
@@ -11,12 +12,14 @@ import (
 func GetCoins(query map[string]string) ([]libscoincap.Coin, error) {
 	coins, err := libscoincap.GetAssets(query)
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
 	// Get IDR value to USD
 	idrVal, err := libscurrencyapi.GetLatestExchangeRate("USD", "IDR")
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -31,12 +34,14 @@ func GetCoins(query map[string]string) ([]libscoincap.Coin, error) {
 func GetCoinById(coinId string) (*libscoincap.Coin, error) {
 	coin, err := libscoincap.GetAssetById(coinId)
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
 	// Get IDR value to USD
 	idrVal, err := libscurrencyapi.GetLatestExchangeRate("USD", "IDR")
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 

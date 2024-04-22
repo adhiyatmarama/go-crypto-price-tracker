@@ -2,6 +2,7 @@ package userservice
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/adhiyatmarama/go-crypto-price-tracker/database"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/libs/libsbcrypt"
@@ -14,12 +15,14 @@ func CreateUser(user usermodel.User) (*usermodel.User, error) {
 	// Add user to table
 	_, err := database.DB.Exec(fmt.Sprintf("INSERT INTO Users(email, password) VALUES('%s', '%s' )", user.Email, passwordHash))
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
 	// Get user from table
 	created, err := GetUserByEmail(user)
 	if err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
@@ -37,6 +40,7 @@ func GetUserByEmail(user usermodel.User) (*usermodel.User, error) {
 		password string
 	)
 	if err := stmt.QueryRow(user.Email).Scan(&email, &password); err != nil {
+		log.Print(err.Error())
 		return nil, err
 	}
 
