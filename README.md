@@ -84,6 +84,8 @@ Example
 | ----- | ---- | -------------- |
 | token | string | token used to use tracker and coin APIs |
 
+<br />
+
 ### POST /user/signin
 
 This endpoint used to sign in. Before using the application, user need to be signed in first to obtain the token
@@ -131,6 +133,8 @@ Example
 | ----- | ---- | -------------- |
 | token | string | token used to use tracker and coin APIs |
 
+<br />
+
 ### GET /user/signout
 
 This endpoint used to sign out
@@ -154,6 +158,8 @@ This endpoint used to sign out
 | Field | Type | Description |
 | ----- | ---- | -------------- |
 | message | string | message of the operation |
+
+<br />
 
 ### GET /coin
 
@@ -201,6 +207,8 @@ Example
 | ----- | ---- | -------------- |
 | message | string | message of the operation |
 
+<br />
+
 ### GET /coin/:coinId
 
 This endpoint used to get a coin information
@@ -236,6 +244,8 @@ This endpoint used to get a coin information
 | Field | Type | Description |
 | ----- | ---- | -------------- |
 | message | string | message of the operation |
+
+<br />
 
 ### POST /tracker
 
@@ -282,6 +292,8 @@ Example
 | ----- | ---- | -------------- |
 | message | string | message of the operation |
 
+<br />
+
 ### GET /tracker
 
 This endpoint used to get user's coin tracker
@@ -311,6 +323,8 @@ This endpoint used to get user's coin tracker
 | Field | Type | Description |
 | ----- | ---- | -------------- |
 | message | string | message of the operation |
+
+<br />
 
 ### DELETE /tracker
 
