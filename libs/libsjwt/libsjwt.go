@@ -7,8 +7,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var SIGN_METHOD = jwt.SigningMethodHS256
-
 func CreateToken(email string, expTime time.Time) (string, error) {
 	claims := &config.JWTClaim{
 		Email: email,
@@ -18,8 +16,18 @@ func CreateToken(email string, expTime time.Time) (string, error) {
 		},
 	}
 
-	tokenAlgo := jwt.NewWithClaims(SIGN_METHOD, claims)
+	tokenAlgo := jwt.NewWithClaims(config.JWT_SIGN_METHOD, claims)
 	token, err := tokenAlgo.SignedString(config.JWT_KEY)
 
 	return token, err
+}
+
+func ParseToken(tokenString string) (*config.JWTClaim, error) {
+	claims := &config.JWTClaim{}
+	// parsing token jwt
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+		return config.JWT_KEY, nil
+	})
+
+	return claims, err
 }
