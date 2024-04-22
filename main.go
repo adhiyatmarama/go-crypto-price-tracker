@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 
+	"github.com/adhiyatmarama/go-crypto-price-tracker/coin/coincontroller"
 	database "github.com/adhiyatmarama/go-crypto-price-tracker/database"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/tracker/trackercontroller"
 	usercontroller "github.com/adhiyatmarama/go-crypto-price-tracker/user/usercontroller"
@@ -25,6 +26,7 @@ func main() {
 		return c.SendString("This is crypto price tracker application, written using go")
 	})
 	app.Mount("/user", usercontroller.GetRoutes())
+	app.Mount("/coin", coincontroller.GetRoutes())
 	app.Mount("/tracker", trackercontroller.GetRoutes())
 
 	app.Listen(":" + port)
