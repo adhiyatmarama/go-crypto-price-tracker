@@ -153,7 +153,7 @@ func GetTrackersByUser(c *fiber.Ctx) error {
 	coinCh := make(chan *libscoincap.Coin, len(coinIds))
 	for _, coinId := range coinIds {
 		wg.Add(1)
-		go func() {
+		go func(coinId string) {
 			defer wg.Done()
 			coin, err := libscoincap.GetAssetById(coinId)
 			if err != nil {
@@ -161,7 +161,7 @@ func GetTrackersByUser(c *fiber.Ctx) error {
 				return
 			}
 			coinCh <- coin
-		}()
+		}(coinId)
 	}
 	wg.Wait()
 	close(getCoinErrorCh)
