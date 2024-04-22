@@ -157,7 +157,6 @@ func GetTrackersByUser(c *fiber.Ctx) error {
 			defer wg.Done()
 			coin, err := libscoincap.GetAssetById(coinId)
 			if err != nil {
-				fmt.Println(err, " === ada error")
 				getCoinErrorCh <- err
 				return
 			}
