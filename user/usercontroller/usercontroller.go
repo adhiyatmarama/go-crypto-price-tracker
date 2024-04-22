@@ -2,14 +2,14 @@ package usercontroller
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"time"
 
-	"github.com/adhiyatmarama/go-crypto-price-tracker/database"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/middlewares"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/user/usermodel"
+	"github.com/adhiyatmarama/go-crypto-price-tracker/user/userservice"
 
-	libsbcrypt "github.com/adhiyatmarama/go-crypto-price-tracker/libs/libsbcrypt"
+	"github.com/adhiyatmarama/go-crypto-price-tracker/libs/libsbcrypt"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/libs/libsjwt"
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/mattn/go-sqlite3"
@@ -55,10 +55,7 @@ func SignUp(c *fiber.Ctx) error {
 		})
 	}
 
-	passwordHash, _ := libsbcrypt.HashPassword(user.Password)
-
-	// Add user to table
-	_, err := database.DB.Exec(fmt.Sprintf("INSERT INTO Users(email, password) VALUES('%s', '%s' )", user.Email, passwordHash))
+	createdUser, err := userservice.CreateUser(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Error when create user to DB",
@@ -66,20 +63,9 @@ func SignUp(c *fiber.Ctx) error {
 		})
 	}
 
-	// Get user from table
-	stmt, _ := database.DB.Prepare("select email from Users where email = ?")
-	defer stmt.Close()
-	var email string
-	if err = stmt.QueryRow(user.Email).Scan(&email); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Error when get user",
-			"error":   err.Error(),
-		})
-	}
-
 	// create jwt token
 	expTime := time.Now().Add(time.Minute * 1)
-	token, err := libsjwt.CreateToken(email, expTime)
+	token, err := libsjwt.CreateToken(createdUser.Email, expTime)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -96,7 +82,7 @@ func SignUp(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"user": fiber.Map{
-			"email": email,
+			"email": createdUser.Email,
 		},
 		"message": "Successfully registered and signed in",
 	})
@@ -112,29 +98,24 @@ func SignIn(c *fiber.Ctx) error {
 		})
 	}
 
-	// get user based on email
-	stmt, _ := database.DB.Prepare("select email, password from Users where email = ?")
-	defer stmt.Close()
-	var (
-		email    string
-		password string
-	)
-	if err := stmt.QueryRow(userLogin.Email).Scan(&email, &password); err != nil {
+	// Get user
+	user, err := userservice.GetUserByEmail(userLogin)
+	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"message": "email or password is invalid",
 			})
 		default:
+			log.Print(err.Error())
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"message": "Server Error",
-				"error":   err.Error(),
+				"message": "Error when get user",
 			})
 		}
 	}
 
 	// check password
-	if !libsbcrypt.CheckPasswordHash(userLogin.Password, password) {
+	if !libsbcrypt.CheckPasswordHash(userLogin.Password, user.Password) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "email or password is invalid",
 		})
@@ -142,7 +123,7 @@ func SignIn(c *fiber.Ctx) error {
 
 	// create jwt token
 	expTime := time.Now().Add(time.Minute * 1)
-	token, err := libsjwt.CreateToken(email, expTime)
+	token, err := libsjwt.CreateToken(user.Email, expTime)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -159,7 +140,7 @@ func SignIn(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"user": fiber.Map{
-			"email": email,
+			"email": user.Email,
 		},
 		"message": "Successfully signed in",
 	})
