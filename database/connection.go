@@ -14,7 +14,6 @@ func ConnectDatabase() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer db.Close()
 
 	DB = db
 }
