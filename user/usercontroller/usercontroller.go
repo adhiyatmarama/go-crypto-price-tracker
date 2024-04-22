@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/adhiyatmarama/go-crypto-price-tracker/database"
+	"github.com/adhiyatmarama/go-crypto-price-tracker/middlewares"
 	"github.com/adhiyatmarama/go-crypto-price-tracker/user/usermodel"
 
 	libsbcrypt "github.com/adhiyatmarama/go-crypto-price-tracker/libs/libsbcrypt"
@@ -19,7 +20,7 @@ func GetRoutes() *fiber.App {
 
 	userRoute.Post("/signup", SignUp)
 	userRoute.Post("/signin", SignIn)
-	userRoute.Get("/signout", SignOut)
+	userRoute.Get("/signout", middlewares.JWTMiddleware, SignOut)
 
 	return userRoute
 }
