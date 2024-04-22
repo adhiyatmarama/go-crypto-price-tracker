@@ -34,6 +34,14 @@ go run main.go
 ```
 
 ## Endpoints
+* [ POST /user/signup ](#post-usersignup)
+* [ POST /user/signin ](#post-usersignin)
+* [ GET /user/signout ](#get-usersignout)
+* [ GET /coin ](#get-coin)
+* [ GET /coin/:coinId](#get-coincoinid)
+* [ POST /tracker ](#post-tracker)
+* [ GET /tracker ](#get-tracker)
+* [ DELETE /tracker](#delete-tracker)
 
 ### POST /user/signup
 
